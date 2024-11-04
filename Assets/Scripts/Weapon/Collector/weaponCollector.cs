@@ -5,7 +5,7 @@ using UnityEngine;
 public class weaponCollector : MonoBehaviour
 {
     private const int maxWeapons = 2;
-    private int currentWeapons = 0;
+    public int currentWeapons = 0;
 
     //weapon positions.
     public Transform weaponOnLeft;
@@ -20,6 +20,7 @@ public class weaponCollector : MonoBehaviour
 
     public Transform reticleTransform;
 
+    //issue: Weapon sometimes appear as there is ONLY 1, but the stack on the same side.
     public void CollectWeapon(GameObject weapon)
     {
         if (currentWeapons < maxWeapons)
@@ -62,7 +63,7 @@ public class weaponCollector : MonoBehaviour
 
             Quaternion targetRotation = Quaternion.LookRotation(shootDirection) * Quaternion.AngleAxis(90, Vector3.right);
             float elapsedTime = 0f;
-            float duration = 1.0f;
+            float duration = 0.3f; //time until sword is thrown.
 
             while (elapsedTime < duration)
             {

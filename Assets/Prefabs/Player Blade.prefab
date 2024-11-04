@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 6009175078090587104}
   - component: {fileID: 4411132808419457738}
   - component: {fileID: 3212589978811219395}
+  - component: {fileID: 1456882037906536628}
   m_Layer: 0
   m_Name: Player Blade
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,7 +111,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &3212589978811219395
 BoxCollider:
@@ -133,3 +134,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.30196956, y: 2.4027097, z: 0.28184322}
   m_Center: {x: -0.00015930831, y: 0.8402673, z: 0.00000032782555}
+--- !u!114 &1456882037906536628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8754268325722959809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14040e11b60134ad69e9a785150a84a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 0}
+  collector: {fileID: 0}
