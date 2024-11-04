@@ -21,7 +21,7 @@ public class AimStateManager : MonoBehaviour
         xAxis += Input.GetAxisRaw("Mouse X") * mouseSense;
         yAxis += Input.GetAxisRaw("Mouse Y") * mouseSense; 
 
-        yAxis = Mathf.Clamp(yAxis, -80, 80);
+        yAxis = Mathf.Clamp(yAxis, -80, 180);
     }
 
     private void LateUpdate()
