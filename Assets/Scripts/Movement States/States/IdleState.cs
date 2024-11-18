@@ -27,7 +27,14 @@ public class IdleState : MovementBaseState
         if (Input.GetKey(KeyCode.C))
         {
             movement.SwitchState(movement.Crouch);
-        }   
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            movement.previousState = this;
+            movement.SwitchState(movement.Jump);
+        }
     }
 }
 
