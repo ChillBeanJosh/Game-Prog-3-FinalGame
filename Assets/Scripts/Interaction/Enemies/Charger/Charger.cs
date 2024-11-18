@@ -46,6 +46,8 @@ public class Charger : MonoBehaviour
     public float recoveryTime;
     private float recoveryTimer = 0f;
 
+    public Animator animator; 
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -92,8 +94,14 @@ public class Charger : MonoBehaviour
 
     void PreparingCharge()
     {
-        LookAt(TargetPosition);
+        animator.SetTrigger("Point");
 
+        LookAt(TargetPosition);
+    }
+
+
+    public void OnPointAnimationEnd()
+    {
         float approxAngle = Vector3.Angle(transform.forward, (TargetPosition - transform.position).normalized);
 
         if (approxAngle < 15f)
@@ -105,6 +113,9 @@ public class Charger : MonoBehaviour
     void Charging()
     {
         CheckForHits();
+
+        animator.SetBool("isCharging", true);
+        animator.speed = currentSpeed / ChargeSpeed;
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
@@ -136,6 +147,8 @@ public class Charger : MonoBehaviour
     {
         CheckForHits();
 
+        animator.SetBool("isCharging", true); 
+
         Vector3 dir = (TargetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
 
@@ -160,6 +173,9 @@ public class Charger : MonoBehaviour
     void HandleRecovery()
     {
         recoveryTimer += Time.deltaTime;
+
+        animator.SetBool("isCharging", false);
+        animator.SetBool("isIdle", true);
 
         if (recoveryTimer >= recoveryTime)
         {
@@ -238,7 +254,6 @@ public class Charger : MonoBehaviour
         }
     }
 }
-
 
 
 
