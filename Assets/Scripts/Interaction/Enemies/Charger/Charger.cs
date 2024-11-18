@@ -8,7 +8,8 @@ public class Charger : MonoBehaviour
     {
         PreparingCharge,
         Charging,
-        SlowingDown
+        SlowingDown,
+        Recovering
     }
 
     public ChargerState currentState;
@@ -42,6 +43,9 @@ public class Charger : MonoBehaviour
     private Rigidbody rb;
     private GameObject player;
 
+    public float recoveryTime;
+    private float recoveryTimer = 0f;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -59,7 +63,7 @@ public class Charger : MonoBehaviour
         acceleration = ChargeSpeed / ChargeDuration;
         slowAcceleration = ChargeSpeed / SlowDownDuration;
 
-        currentState = ChargerState.PreparingCharge; 
+        currentState = ChargerState.PreparingCharge;
     }
 
     private void Update()
@@ -78,6 +82,10 @@ public class Charger : MonoBehaviour
 
             case ChargerState.SlowingDown:
                 SlowdownCharge();
+                break;
+
+            case ChargerState.Recovering:
+                HandleRecovery();
                 break;
         }
     }
@@ -119,7 +127,7 @@ public class Charger : MonoBehaviour
 
             if (holdMaxSpeedCurrentTime >= SpeedHoldTime)
             {
-                currentState = ChargerState.SlowingDown; // Transition to SlowingDown state
+                currentState = ChargerState.SlowingDown;
             }
         }
     }
@@ -145,7 +153,17 @@ public class Charger : MonoBehaviour
         }
         else
         {
-            ResetForNextCharge(); 
+            currentState = ChargerState.Recovering;
+        }
+    }
+
+    void HandleRecovery()
+    {
+        recoveryTimer += Time.deltaTime;
+
+        if (recoveryTimer >= recoveryTime)
+        {
+            ResetForNextCharge();
         }
     }
 
@@ -155,6 +173,7 @@ public class Charger : MonoBehaviour
         holdMaxSpeedCurrentTime = 0f;
         atMaxSpeed = false;
         hasStopped = false;
+        recoveryTimer = 0f;
         currentState = ChargerState.PreparingCharge;
     }
 
@@ -189,7 +208,10 @@ public class Charger : MonoBehaviour
                 Vector3 knockbackDirection = (hitPlayer.transform.position - transform.position).normalized;
                 ApplyKnockback(hitPlayer.gameObject, knockbackDirection, KnockbackForce);
 
-                //hitPlayer.TakeDamage(10);
+                hitPlayer.TakeDamage(15);
+
+                currentState = ChargerState.Recovering;
+                recoveryTimer = 0f;
             }
         }
     }
@@ -211,7 +233,7 @@ public class Charger : MonoBehaviour
             }
             else
             {
-                controller.Move(knockbackVector * 20);  
+                controller.Move(knockbackVector * 20);
             }
         }
     }

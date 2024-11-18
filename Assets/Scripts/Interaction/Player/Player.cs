@@ -35,12 +35,12 @@ public class Player : MonoBehaviour
         }
     }
 
-    void TakeHeal(int heal)
+    public void TakeHeal(float heal)
     {
         currentHealth += heal;
     }
 
-    void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         currentHealth -= damage;
 
