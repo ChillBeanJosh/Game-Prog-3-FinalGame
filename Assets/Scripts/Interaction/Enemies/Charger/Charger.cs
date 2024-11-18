@@ -9,17 +9,18 @@ public class Charger : MonoBehaviour
         PreparingCharge,
         Charging,
         SlowingDown,
-        Recovering
+        Recovering,
+        Impact
     }
 
     public ChargerState currentState;
 
     public float rotationSpeed = 5f;
-    public float currentSpeed = 0f;
-    public float holdMaxSpeedCurrentTime = 0f;
+    private float currentSpeed = 0f;
+    private float holdMaxSpeedCurrentTime = 0f;
 
-    public bool atMaxSpeed = false;
-    public bool hasStopped = false;
+    private bool atMaxSpeed = false;
+    private bool hasStopped = false;
 
     private float acceleration;
     private float slowAcceleration;
@@ -46,7 +47,7 @@ public class Charger : MonoBehaviour
     public float recoveryTime;
     private float recoveryTimer = 0f;
 
-    public Animator animator; 
+    public Animator animator;
 
     private void Awake()
     {
@@ -65,7 +66,7 @@ public class Charger : MonoBehaviour
         acceleration = ChargeSpeed / ChargeDuration;
         slowAcceleration = ChargeSpeed / SlowDownDuration;
 
-        currentState = ChargerState.PreparingCharge;
+        currentState = ChargerState.Recovering;
     }
 
     private void Update()
@@ -89,6 +90,10 @@ public class Charger : MonoBehaviour
             case ChargerState.Recovering:
                 HandleRecovery();
                 break;
+
+            case ChargerState.Impact:
+                // Impact state does nothing directly, as handled by the Animator
+                break;
         }
     }
 
@@ -98,7 +103,6 @@ public class Charger : MonoBehaviour
 
         LookAt(TargetPosition);
     }
-
 
     public void OnPointAnimationEnd()
     {
@@ -119,7 +123,6 @@ public class Charger : MonoBehaviour
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ChargeTurnRate * Time.deltaTime);
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
 
@@ -147,11 +150,10 @@ public class Charger : MonoBehaviour
     {
         CheckForHits();
 
-        animator.SetBool("isCharging", true); 
+        animator.SetBool("isCharging", true);
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
-
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, SlowDownTurnRate * Time.deltaTime);
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
 
@@ -170,16 +172,23 @@ public class Charger : MonoBehaviour
         }
     }
 
+    void EnterRecovery()
+    {
+        currentState = ChargerState.Recovering;
+        animator.SetBool("isIdle", true);
+    }
+
     void HandleRecovery()
     {
-        recoveryTimer += Time.deltaTime;
+        recoveryTimer += Time.deltaTime; // Increment the recovery timer
 
-        animator.SetBool("isCharging", false);
-        animator.SetBool("isIdle", true);
+        animator.SetBool("isCharging", false); // Stop charging animation
+        animator.SetBool("isIdle", true); // Ensure idle animation plays during recovery
 
-        if (recoveryTimer >= recoveryTime)
+        if (recoveryTimer >= recoveryTime) // Check if recovery time has elapsed
         {
-            ResetForNextCharge();
+            ResetForNextCharge(); // Reset for the next charge
+            currentState = ChargerState.PreparingCharge; // Transition to the PreparingCharge state
         }
     }
 
@@ -189,8 +198,7 @@ public class Charger : MonoBehaviour
         holdMaxSpeedCurrentTime = 0f;
         atMaxSpeed = false;
         hasStopped = false;
-        recoveryTimer = 0f;
-        currentState = ChargerState.PreparingCharge;
+        recoveryTimer = 0f; // Reset the recovery timer
     }
 
     public void LookAt(Vector3 target)
@@ -199,7 +207,6 @@ public class Charger : MonoBehaviour
 
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0, angle, 0);
-
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
@@ -219,6 +226,10 @@ public class Charger : MonoBehaviour
 
             if (hitPlayer != null)
             {
+                animator.SetTrigger("Smash");
+
+                animator.SetBool("isCharging", false);
+                animator.SetBool("isIdle", false);
                 Debug.Log("Player hit detected!");
 
                 Vector3 knockbackDirection = (hitPlayer.transform.position - transform.position).normalized;
@@ -226,8 +237,8 @@ public class Charger : MonoBehaviour
 
                 hitPlayer.TakeDamage(15);
 
-                currentState = ChargerState.Recovering;
-                recoveryTimer = 0f;
+                // Transition to the Impact state after the hit
+                currentState = ChargerState.Impact;
             }
         }
     }
@@ -238,14 +249,15 @@ public class Charger : MonoBehaviour
 
         if (controller != null)
         {
-            Vector3 knockbackVector = direction * force * Time.deltaTime;
+            // Calculate the knockback vector with both horizontal and upward force
+            Vector3 knockbackVector = (direction.normalized + Vector3.up * 0.5f).normalized * force * Time.deltaTime;
 
             RaycastHit hit;
             bool isBlocked = Physics.Raycast(target.transform.position, direction, out hit, knockbackVector.magnitude + 0.1f);
 
             if (isBlocked)
             {
-                controller.Move(direction * (hit.distance - 0.1f));
+                controller.Move((direction.normalized + Vector3.up * 0.5f).normalized * (hit.distance - 0.1f));
             }
             else
             {
@@ -254,6 +266,7 @@ public class Charger : MonoBehaviour
         }
     }
 }
+
 
 
 
