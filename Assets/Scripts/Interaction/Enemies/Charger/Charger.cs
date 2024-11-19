@@ -92,7 +92,6 @@ public class Charger : MonoBehaviour
                 break;
 
             case ChargerState.Impact:
-                // Impact state does nothing directly, as handled by the Animator
                 break;
         }
     }
