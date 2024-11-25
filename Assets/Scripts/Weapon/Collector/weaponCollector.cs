@@ -14,16 +14,18 @@ public class weaponCollector : MonoBehaviour
 
     public float throwForce = 10f;
     public float rotationSpeed = 5f;
-    public float destructionDelay = 5f;
 
     public Vector3 offset = Vector3.zero;
 
     public Transform reticleTransform;
 
-    //issue: Weapon sometimes appear as there is ONLY 1, but the stack on the same side.
+    private bool canCollect = true;  
+    private float collectCooldown = 1f;
+
+    // Collect a weapon
     public void CollectWeapon(GameObject weapon)
     {
-        if (currentWeapons < maxWeapons)
+        if (currentWeapons < maxWeapons && canCollect)  
         {
             Vector3 targetPosition = (currentWeapons == 0) ? weaponOnLeft.position : weaponOnRight.position;
             weapon.transform.SetParent(transform);
@@ -33,68 +35,91 @@ public class weaponCollector : MonoBehaviour
             weapon.transform.localScale = Vector3.one;
 
             currentWeapons++;
+            Debug.Log("Weapon Collected! Total: " + currentWeapons);
+        }
+        else
+        {
+            Debug.Log("Cannot collect weapon right now.");
         }
     }
 
     public IEnumerator ThrowWeapon(GameObject weapon)
     {
-        if (weapon.transform.IsChildOf(transform))
+        if (weapon == null || !weapon.transform.IsChildOf(transform))
         {
-            // Detach weapon from player
-            weapon.transform.SetParent(null);
+            yield break;  
+        }
 
-            Rigidbody rb = weapon.GetComponent<Rigidbody>();
+        StartCoroutine(CollectCooldown());
 
-            if (rb != null)
-            {
-                rb.isKinematic = false;
-            }
+        // Detach weapon from player
+        weapon.transform.SetParent(null);
 
-            Vector3 shootDirection;
+        Rigidbody rb = weapon.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+        }
 
-            if (reticleTransform != null)
-            {
-                shootDirection = (reticleTransform.position - weapon.transform.position).normalized;
-            }
-            else
-            {
-                shootDirection = playerCamera.transform.forward;
-            }
+        Vector3 shootDirection;
 
-            Quaternion targetRotation = Quaternion.LookRotation(shootDirection) * Quaternion.AngleAxis(90, Vector3.right);
-            float elapsedTime = 0f;
-            float duration = 0.3f; //time until sword is thrown.
+        if (reticleTransform != null)
+        {
+            shootDirection = (reticleTransform.position - weapon.transform.position).normalized;
+        }
+        else
+        {
+            shootDirection = playerCamera.transform.forward;
+        }
 
-            while (elapsedTime < duration)
-            {
-                weapon.transform.rotation = Quaternion.Slerp(weapon.transform.rotation, targetRotation, elapsedTime / duration * rotationSpeed);
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
+        Quaternion targetRotation = Quaternion.LookRotation(shootDirection) * Quaternion.AngleAxis(90, Vector3.right);
+        float elapsedTime = 0f;
+        float duration = 0.3f;  // Time until sword is thrown
 
-            if (rb != null)
-            {
-                weapon.transform.rotation = targetRotation;
+        // Rotate the weapon smoothly toward the target direction
+        while (elapsedTime < duration)
+        {
+            if (weapon == null) yield break;  
+            weapon.transform.rotation = Quaternion.Slerp(weapon.transform.rotation, targetRotation, elapsedTime / duration * rotationSpeed);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
 
-                rb.AddForce(shootDirection * throwForce, ForceMode.Impulse);
-                rb.AddTorque(Random.insideUnitSphere * 5f, ForceMode.Impulse);
+        if (rb != null)
+        {
+            if (weapon == null) yield break;  
+            weapon.transform.rotation = targetRotation;
 
-                rb.constraints = RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationX;
-            }
+            rb.AddForce(shootDirection * throwForce, ForceMode.Impulse);
+            rb.AddTorque(Random.insideUnitSphere * 5f, ForceMode.Impulse);
 
-            StartCoroutine(DestroyWeaponAfterDelay(weapon, destructionDelay));
+            rb.constraints = RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationX;
+        }
 
+        currentWeapons--;
+        Debug.Log("You now have: " + currentWeapons + " weapons!");
+    }
+
+    private IEnumerator CollectCooldown()
+    {
+        canCollect = false; 
+        Debug.Log("Weapon collection disabled for " + collectCooldown + " seconds.");
+        yield return new WaitForSeconds(collectCooldown); 
+        canCollect = true;  
+        Debug.Log("Weapon collection enabled.");
+    }
+
+    // Method to decrement weapon count when the weapon is destroyed by explosion
+    public void DecrementWeaponCount()
+    {
+        if (currentWeapons > 0)
+        {
             currentWeapons--;
-            Debug.Log("YOU NOW HAVE: " + currentWeapons + "!");
+            Debug.Log("Weapon count decremented due to explosion. Current count: " + currentWeapons);
         }
     }
 
-    public IEnumerator DestroyWeaponAfterDelay(GameObject weapon, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        Destroy(weapon);
-    }
-
+    // Calculate direction for the throw (not used in this example but could be useful elsewhere)
     public Vector3 CalculateThrowDirection(Vector3 weaponPosition)
     {
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
@@ -106,6 +131,7 @@ public class weaponCollector : MonoBehaviour
         return playerCamera.transform.forward;
     }
 
+    // Get the number of collected weapons
     public int GetWeaponCount()
     {
         return currentWeapons;

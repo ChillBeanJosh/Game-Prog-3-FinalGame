@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
 
     public healthBar healthBar;
 
+    public Animator anim;
 
     private void Start()
     {
@@ -46,8 +47,9 @@ public class Player : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            anim.SetTrigger("Death");
+            
             //disable all other player controls.
-            //play death anim
             //game over screen.
         }
     }

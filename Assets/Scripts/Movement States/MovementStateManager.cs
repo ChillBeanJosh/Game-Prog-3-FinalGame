@@ -22,7 +22,7 @@ public class MovementStateManager : MonoBehaviour
 
     [SerializeField] float gravity = -9.81f;
     [SerializeField] float jumpForce = 10;
-    [HideInInspector] public bool jumped;
+     public bool jumped;
     Vector3 velocity;
 
     CharacterController controller;

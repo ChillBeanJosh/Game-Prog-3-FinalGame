@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4411132808419457738}
   - component: {fileID: 3212589978811219395}
   - component: {fileID: 1456882037906536628}
+  - component: {fileID: 918910480305855872}
   m_Layer: 0
   m_Name: Player Blade
   m_TagString: Weapon
@@ -148,3 +149,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawner: {fileID: 0}
   collector: {fileID: 0}
+--- !u!114 &918910480305855872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8754268325722959809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96da115dda9e584469ee928d4069d045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionObject: {fileID: 4219295713150509177, guid: 30faa6798df806949a21ac26058adc29, type: 3}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  spawnOffset: {x: 0, y: 0, z: 0}
+  destructionDelay: 5
