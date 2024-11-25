@@ -282,7 +282,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 60.000004
+  field of view: 120
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -575,7 +575,7 @@ MonoBehaviour:
   Damping: {x: 0, y: 0, z: 0}
   ShoulderOffset: {x: 0, y: 0, z: 0}
   VerticalArmLength: 0.4
-  CameraSide: 1
+  CameraSide: 0.495
   CameraDistance: 3
   CameraCollisionFilter:
     serializedVersion: 2
@@ -768,7 +768,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 292683401}
   m_Follow: {fileID: 292683401}
   m_Lens:
-    FieldOfView: 60.000004
+    FieldOfView: 120
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 5000
@@ -1140,7 +1140,7 @@ MonoBehaviour:
   zPos: 0
   enemyCount: 0
   enemyLimit: 10
-  spawnTime: 3
+  spawnTime: 6
 --- !u!4 &1857275163
 Transform:
   m_ObjectHideFlags: 0
@@ -1296,8 +1296,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 899946994}
     - target: {fileID: 3380484912190672806, guid: 4b8a66d769f6c4440a411d372c54c64f, type: 3}
+      propertyPath: runSpeed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3380484912190672806, guid: 4b8a66d769f6c4440a411d372c54c64f, type: 3}
       propertyPath: jumpForce
       value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3380484912190672806, guid: 4b8a66d769f6c4440a411d372c54c64f, type: 3}
+      propertyPath: walkSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3380484912190672806, guid: 4b8a66d769f6c4440a411d372c54c64f, type: 3}
+      propertyPath: runBackSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3380484912190672806, guid: 4b8a66d769f6c4440a411d372c54c64f, type: 3}
+      propertyPath: walkBackSpeed
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6438758856705093948, guid: 4b8a66d769f6c4440a411d372c54c64f, type: 3}
       propertyPath: playerCamera

@@ -49,6 +49,9 @@ public class Charger : MonoBehaviour
 
     public Animator animator;
 
+    public LayerMask groundLayer; // Layer mask to detect the ground
+    public float groundCheckDistance = 0.1f; // Distance for ground checking
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -121,9 +124,15 @@ public class Charger : MonoBehaviour
         animator.speed = currentSpeed / ChargeSpeed;
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
+
+        // Ensure the charger only moves horizontally
+        dir.y = 0;
+
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ChargeTurnRate * Time.deltaTime);
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
+
+        StayGrounded();
 
         if (!atMaxSpeed)
         {
@@ -152,9 +161,15 @@ public class Charger : MonoBehaviour
         animator.SetBool("isCharging", true);
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
+
+        // Ensure the charger only moves horizontally
+        dir.y = 0;
+
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, SlowDownTurnRate * Time.deltaTime);
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
+
+        StayGrounded();
 
         if (!hasStopped)
         {
@@ -204,9 +219,24 @@ public class Charger : MonoBehaviour
     {
         Vector3 dir = target - transform.position;
 
+        // Ensure rotation is horizontal only
+        dir.y = 0;
+
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0, angle, 0);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    private void StayGrounded()
+    {
+        // Perform a raycast to check for the ground
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundCheckDistance, groundLayer))
+        {
+            // Adjust the position to stick to the ground
+            Vector3 pos = transform.position;
+            pos.y = hit.point.y;
+            transform.position = pos;
+        }
     }
 
     private void OnDrawGizmos()

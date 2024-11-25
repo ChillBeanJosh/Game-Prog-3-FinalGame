@@ -3038,12 +3038,16 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   HitBoxLocation: {fileID: 769277369995609444}
-  HitboxRadius: 12
+  HitboxRadius: 15
   currentSpeed: 3.5
   ArcherTurnRate: 360
   BowDrawTime: 1
   hasFired: 0
   runAwaySpeed: 0.025
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckDistance: 0.1
 --- !u!54 &3935668272200391617
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3052,7 +3056,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7376406475489772367}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 50
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}

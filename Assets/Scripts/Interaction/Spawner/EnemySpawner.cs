@@ -9,7 +9,7 @@ public class EnemySpawner : MonoBehaviour
     public int zPos;
     public int enemyCount = 0;
     public int enemyLimit = 10;
-    public float spawnTime = 3;
+    public float spawnTime = 6;
 
  
 
@@ -44,7 +44,7 @@ public class EnemySpawner : MonoBehaviour
 
             xPos = Random.Range(-30, 45); 
             zPos = Random.Range(-60, 20);
-            Vector3 position2 = new Vector3(xPos, 1, zPos);
+            Vector3 position2 = new Vector3(xPos, 0.05f, zPos);
 
             Instantiate(enemy[0], position1, Quaternion.identity); 
             Instantiate(enemy[1], position2, Quaternion.identity); 

@@ -5,7 +5,7 @@ using static Charger;
 
 public class Archer : MonoBehaviour
 {
-    public enum ArcherState
+   public enum ArcherState
     {
         MovingToTarget,
         PrepareFire,
@@ -37,8 +37,10 @@ public class Archer : MonoBehaviour
 
     public bool hasFired = false;
 
-
     public float runAwaySpeed;
+
+    public LayerMask groundLayer; // Layer mask to detect ground
+    public float groundCheckDistance = 0.1f; // Distance for ground checking
 
     private void Awake()
     {
@@ -56,7 +58,6 @@ public class Archer : MonoBehaviour
 
         currentState = ArcherState.MovingToTarget;
     }
-
 
     private void Update()
     {
@@ -82,7 +83,6 @@ public class Archer : MonoBehaviour
         }
     }
 
-
     void MoveTowardsPlayer()
     {
         animator.SetBool("RunAway", false);
@@ -93,11 +93,19 @@ public class Archer : MonoBehaviour
         WithinFireRange();
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
+
+        // Ensure the archer only moves horizontally by nullifying the Y-component of direction
+        dir.y = 0;
+
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ArcherTurnRate * Time.deltaTime);
-        transform.position += transform.forward * currentSpeed * Time.deltaTime;
-    }
 
+        // Move the archer forward on the ground
+        Vector3 move = transform.forward * currentSpeed * Time.deltaTime;
+        transform.position += move;
+
+        StayGrounded();
+    }
 
     void PrepareFire()
     {
@@ -110,10 +118,8 @@ public class Archer : MonoBehaviour
 
             currentSpeed = 0;
             LookAt(TargetPosition);
-
         }
     }
-   
 
     void Fire()
     {
@@ -149,12 +155,27 @@ public class Archer : MonoBehaviour
     {
         Vector3 dir = target - transform.position;
 
+        // Ensure the archer only rotates horizontally by nullifying the Y-component of direction
+        dir.y = 0;
+
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0, angle, 0);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
-    //visualize range.
+    private void StayGrounded()
+    {
+        // Perform a raycast to check for the ground
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundCheckDistance, groundLayer))
+        {
+            // Adjust the position to stick to the ground
+            Vector3 pos = transform.position;
+            pos.y = hit.point.y;
+            transform.position = pos;
+        }
+    }
+
+    // Visualize range.
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -188,6 +209,9 @@ public class Archer : MonoBehaviour
             // Calculate the direction to run away from the player
             Vector3 dir = (transform.position - TargetPosition).normalized;
 
+            // Ensure the archer only moves horizontally
+            dir.y = 0;
+
             // Smoothly rotate towards the opposite direction
             Quaternion targetRotation = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ArcherTurnRate * Time.deltaTime);
@@ -197,6 +221,8 @@ public class Archer : MonoBehaviour
 
             // Apply the adjusted speed to move the character away from the player
             transform.position += dir * adjustedSpeed;
+
+            StayGrounded();
 
             elapsedTime += Time.deltaTime;
 
@@ -209,7 +235,7 @@ public class Archer : MonoBehaviour
         currentState = ArcherState.MovingToTarget;
     }
 
-    //controlled through animation events.
+    // Controlled through animation events.
     IEnumerator EnterFireState()
     {
         Debug.Log("Preparing Draw...");
@@ -221,7 +247,7 @@ public class Archer : MonoBehaviour
         currentState = ArcherState.Shooting;
     }
 
-    //controlled through animation events.
+    // Controlled through animation events.
     public void EnterReadjust()
     {
         Debug.Log("Transitioning to Readjust State.");
