@@ -76,11 +76,16 @@ public class ExplosionProperty : MonoBehaviour
     private System.Collections.IEnumerator LaunchObject(Rigidbody rb, Vector3 direction)
     {
         float elapsedTime = 0f;                
-        Vector3 initialPosition = rb.position; 
+        Vector3 initialPosition = rb != null ? rb.position : Vector3.zero; // Ensure initialPosition has a fallback if rb is null
         Vector3 velocity = direction * enemylaunchForce; 
 
         while (elapsedTime < launchDuration)
         {
+            if (rb == null) // Null check to ensure the Rigidbody still exists
+            {
+                yield break; // Exit the coroutine early if the Rigidbody is destroyed
+            }
+
             Vector3 displacement = velocity * elapsedTime + 0.5f * new Vector3(0, gravity, 0) * Mathf.Pow(elapsedTime, 2);
             rb.MovePosition(initialPosition + displacement);
 
