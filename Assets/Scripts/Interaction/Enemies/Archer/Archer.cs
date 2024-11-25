@@ -19,6 +19,11 @@ public class Archer : MonoBehaviour
     private Rigidbody rb;
     private GameObject player;
 
+    public GameObject arrowObject;
+    public Transform arrowSpawnPosition;
+
+    public Animator animator;
+
     public float rotationSpeed;
 
     public LayerMask hitLayer;
@@ -27,6 +32,13 @@ public class Archer : MonoBehaviour
 
     public float currentSpeed;
     public float ArcherTurnRate;
+
+    public float BowDrawTime;
+
+    public bool hasFired = false;
+
+
+    public float runAwaySpeed;
 
     private void Awake()
     {
@@ -73,33 +85,64 @@ public class Archer : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
+        animator.SetBool("RunAway", false);
+        animator.SetBool("MoveTo", true);
+
+        currentSpeed = 3.5f;
+
         WithinFireRange();
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ArcherTurnRate * Time.deltaTime);
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
-
     }
 
 
     void PrepareFire()
     {
-        currentSpeed = 0;
-        LookAt(TargetPosition);
+        if (!hasFired)
+        {
+            animator.SetBool("RunAway", false);
+            animator.SetBool("MoveTo", false);
 
+            animator.SetTrigger("Draw");
 
+            currentSpeed = 0;
+            LookAt(TargetPosition);
+
+        }
     }
-
+   
 
     void Fire()
     {
+        if (!hasFired)
+        {
+            Debug.Log("Arrow has been fired!");
 
+            Vector3 directionToPlayer = (TargetPosition - arrowSpawnPosition.position).normalized;
+            Quaternion arrowRotation = Quaternion.Euler(90, 0, 0);
+
+            float angle = Mathf.Atan2(directionToPlayer.x, directionToPlayer.z) * Mathf.Rad2Deg;
+
+            Vector3 adjustedRotation = arrowRotation.eulerAngles;
+            adjustedRotation.z = angle;
+            arrowRotation = Quaternion.Euler(adjustedRotation);
+
+            GameObject arrow = Instantiate(arrowObject, arrowSpawnPosition.position, arrowRotation);
+
+            arrow.GetComponent<ArcherProjectile>().Initialize(directionToPlayer);
+
+            hasFired = true;
+            animator.SetTrigger("Drop Bow");
+        }
     }
 
     void Readjust()
     {
-
+        Debug.Log("Archer is Running Away!");
+        StartCoroutine(RunAwayForSeconds(1.5f));
     }
 
     public void LookAt(Vector3 target)
@@ -131,6 +174,61 @@ public class Archer : MonoBehaviour
                 currentState = ArcherState.PrepareFire;
             }
         }
+    }
+
+    IEnumerator RunAwayForSeconds(float duration)
+    {
+        animator.SetBool("RunAway", true);
+        animator.SetBool("MoveTo", false);
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            // Calculate the direction to run away from the player
+            Vector3 dir = (transform.position - TargetPosition).normalized;
+
+            // Smoothly rotate towards the opposite direction
+            Quaternion targetRotation = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ArcherTurnRate * Time.deltaTime);
+
+            // Adjust movement using runAwaySpeed and Time.deltaTime
+            float adjustedSpeed = runAwaySpeed * Time.deltaTime;
+
+            // Apply the adjusted speed to move the character away from the player
+            transform.position += dir * adjustedSpeed;
+
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+
+        // Transition back to moving towards the player
+        animator.SetBool("RunAway", false);
+        animator.SetBool("MoveTo", true);
+        currentState = ArcherState.MovingToTarget;
+    }
+
+    //controlled through animation events.
+    IEnumerator EnterFireState()
+    {
+        Debug.Log("Preparing Draw...");
+        yield return new WaitForSeconds(BowDrawTime);
+
+        Debug.Log("Transitioning to Fire State.");
+        animator.ResetTrigger("Draw");
+
+        currentState = ArcherState.Shooting;
+    }
+
+    //controlled through animation events.
+    public void EnterReadjust()
+    {
+        Debug.Log("Transitioning to Readjust State.");
+        animator.ResetTrigger("Drop Bow");
+
+        hasFired = false;
+        currentState = ArcherState.Readjust;
     }
 
 }
