@@ -279,7 +279,7 @@ public class Charger : MonoBehaviour
         if (controller != null)
         {
             // Calculate the knockback vector with both horizontal and upward force
-            Vector3 knockbackVector = (direction.normalized + Vector3.up * 0.5f).normalized * force * Time.deltaTime;
+            Vector3 knockbackVector = (direction.normalized + Vector3.up * 0.0f).normalized * force * Time.deltaTime;
 
             RaycastHit hit;
             bool isBlocked = Physics.Raycast(target.transform.position, direction, out hit, knockbackVector.magnitude + 0.1f);

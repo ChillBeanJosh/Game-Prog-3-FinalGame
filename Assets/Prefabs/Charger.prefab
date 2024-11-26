@@ -1553,7 +1553,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 3
   rotationSpeed: 5
-  ChargeSpeed: 15
+  ChargeSpeed: 10
   SpeedHoldTime: 1
   ChargeDuration: 2
   ChargeTurnRate: 45
@@ -1564,7 +1564,7 @@ MonoBehaviour:
     m_Bits: 128
   HitBoxLocation: {fileID: 5136449492778173396}
   HitboxRadius: 2.1
-  KnockbackForce: 200
+  KnockbackForce: 25
   recoveryTime: 2
   animator: {fileID: 8428058279906656659}
   groundLayer:
