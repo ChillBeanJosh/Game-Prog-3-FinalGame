@@ -47,10 +47,9 @@ public class Player : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            anim.SetTrigger("Death");
-            
-            //disable all other player controls.
-            //game over screen.
+            sceneManager.Instance.LoadScene(sceneManager.Scene.GameOver);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 }

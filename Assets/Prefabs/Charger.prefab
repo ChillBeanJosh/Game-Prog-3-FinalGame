@@ -1564,7 +1564,7 @@ MonoBehaviour:
     m_Bits: 128
   HitBoxLocation: {fileID: 5136449492778173396}
   HitboxRadius: 2.1
-  KnockbackForce: 25
+  KnockbackForce: 7.5
   recoveryTime: 2
   animator: {fileID: 8428058279906656659}
   groundLayer:

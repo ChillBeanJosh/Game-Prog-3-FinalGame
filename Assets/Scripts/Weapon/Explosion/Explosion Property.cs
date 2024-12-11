@@ -65,6 +65,11 @@ public class ExplosionProperty : MonoBehaviour
 
                 // Destroys the enemy after the specified time frame.
                 Destroy(other.gameObject, ragdollDestroy);
+
+                if (ScoreCollector.Instance != null)
+                {
+                    ScoreCollector.Instance.AddScore(1); // Increment score by 1
+                }
             }
             else
             {

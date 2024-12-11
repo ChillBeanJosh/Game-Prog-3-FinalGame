@@ -94,13 +94,12 @@ public class Archer : MonoBehaviour
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
 
-        // Ensure the archer only moves horizontally by nullifying the Y-component of direction
+        //stays flat.
         dir.y = 0;
 
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ArcherTurnRate * Time.deltaTime);
 
-        // Move the archer forward on the ground
         Vector3 move = transform.forward * currentSpeed * Time.deltaTime;
         transform.position += move;
 
@@ -155,7 +154,6 @@ public class Archer : MonoBehaviour
     {
         Vector3 dir = target - transform.position;
 
-        // Ensure the archer only rotates horizontally by nullifying the Y-component of direction
         dir.y = 0;
 
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
@@ -165,17 +163,14 @@ public class Archer : MonoBehaviour
 
     private void StayGrounded()
     {
-        // Perform a raycast to check for the ground
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundCheckDistance, groundLayer))
         {
-            // Adjust the position to stick to the ground
             Vector3 pos = transform.position;
             pos.y = hit.point.y;
             transform.position = pos;
         }
     }
 
-    // Visualize range.
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -206,20 +201,15 @@ public class Archer : MonoBehaviour
 
         while (elapsedTime < duration)
         {
-            // Calculate the direction to run away from the player
             Vector3 dir = (transform.position - TargetPosition).normalized;
 
-            // Ensure the archer only moves horizontally
             dir.y = 0;
 
-            // Smoothly rotate towards the opposite direction
             Quaternion targetRotation = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, ArcherTurnRate * Time.deltaTime);
 
-            // Adjust movement using runAwaySpeed and Time.deltaTime
             float adjustedSpeed = runAwaySpeed * Time.deltaTime;
 
-            // Apply the adjusted speed to move the character away from the player
             transform.position += dir * adjustedSpeed;
 
             StayGrounded();
@@ -229,13 +219,11 @@ public class Archer : MonoBehaviour
             yield return null;
         }
 
-        // Transition back to moving towards the player
         animator.SetBool("RunAway", false);
         animator.SetBool("MoveTo", true);
         currentState = ArcherState.MovingToTarget;
     }
 
-    // Controlled through animation events.
     IEnumerator EnterFireState()
     {
         Debug.Log("Preparing Draw...");

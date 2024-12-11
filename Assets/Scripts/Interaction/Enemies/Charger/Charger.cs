@@ -49,8 +49,8 @@ public class Charger : MonoBehaviour
 
     public Animator animator;
 
-    public LayerMask groundLayer; // Layer mask to detect the ground
-    public float groundCheckDistance = 0.1f; // Distance for ground checking
+    public LayerMask groundLayer; 
+    public float groundCheckDistance = 0.1f;
 
     private void Awake()
     {
@@ -125,7 +125,6 @@ public class Charger : MonoBehaviour
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
 
-        // Ensure the charger only moves horizontally
         dir.y = 0;
 
         Quaternion targetRotation = Quaternion.LookRotation(dir);
@@ -162,7 +161,6 @@ public class Charger : MonoBehaviour
 
         Vector3 dir = (TargetPosition - transform.position).normalized;
 
-        // Ensure the charger only moves horizontally
         dir.y = 0;
 
         Quaternion targetRotation = Quaternion.LookRotation(dir);
@@ -194,15 +192,15 @@ public class Charger : MonoBehaviour
 
     void HandleRecovery()
     {
-        recoveryTimer += Time.deltaTime; // Increment the recovery timer
+        recoveryTimer += Time.deltaTime; 
 
-        animator.SetBool("isCharging", false); // Stop charging animation
-        animator.SetBool("isIdle", true); // Ensure idle animation plays during recovery
+        animator.SetBool("isCharging", false); 
+        animator.SetBool("isIdle", true); 
 
-        if (recoveryTimer >= recoveryTime) // Check if recovery time has elapsed
+        if (recoveryTimer >= recoveryTime) 
         {
-            ResetForNextCharge(); // Reset for the next charge
-            currentState = ChargerState.PreparingCharge; // Transition to the PreparingCharge state
+            ResetForNextCharge();
+            currentState = ChargerState.PreparingCharge;
         }
     }
 
@@ -212,14 +210,13 @@ public class Charger : MonoBehaviour
         holdMaxSpeedCurrentTime = 0f;
         atMaxSpeed = false;
         hasStopped = false;
-        recoveryTimer = 0f; // Reset the recovery timer
+        recoveryTimer = 0f; 
     }
 
     public void LookAt(Vector3 target)
     {
         Vector3 dir = target - transform.position;
 
-        // Ensure rotation is horizontal only
         dir.y = 0;
 
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
@@ -229,10 +226,8 @@ public class Charger : MonoBehaviour
 
     private void StayGrounded()
     {
-        // Perform a raycast to check for the ground
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundCheckDistance, groundLayer))
         {
-            // Adjust the position to stick to the ground
             Vector3 pos = transform.position;
             pos.y = hit.point.y;
             transform.position = pos;
@@ -266,7 +261,6 @@ public class Charger : MonoBehaviour
 
                 hitPlayer.TakeDamage(15);
 
-                // Transition to the Impact state after the hit
                 currentState = ChargerState.Impact;
             }
         }
@@ -278,7 +272,6 @@ public class Charger : MonoBehaviour
 
         if (controller != null)
         {
-            // Calculate the knockback vector with both horizontal and upward force
             Vector3 knockbackVector = (direction.normalized + Vector3.up * 0.0f).normalized * force * Time.deltaTime;
 
             RaycastHit hit;
